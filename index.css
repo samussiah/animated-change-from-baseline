@@ -1,0 +1,11 @@
+.acfb-main {
+    width: 100%;
+    height: calc(100vh - 16px);
+    position: relative;
+}
+.acfb-hidden {
+    display: none !important;
+}
+.acfb-invisible {
+    visibility: hidden !important;
+}

@@ -1,0 +1,58 @@
+{
+    "TODO": "add canvas",
+  "name": "animated-change-from-baseline",
+  "version": "1.0.0",
+  "description": "an animated bubble plot of change from baseline",
+  "module": "./src/index.js",
+  "main": "./index.js",
+  "scripts": {
+    "build": "npm audit fix && npm run bundle && npm run format && npm run minify",
+    "bundle": "rollup -c",
+    "bundle-test-page": "html-inline ./test-page/index.html ./test-page/bundle.html",
+    "format": "npm run format-src && npm run format-bundle && npm run format-css",
+    "format-bundle": "prettier --print-width=100 --tab-width=4 --end-of-line=auto --single-quote --write ./index.js",
+    "format-css": "prettier --print-width=100 --tab-width=4 --end-of-line=auto --single-quote --write ./index.css",
+    "format-src": "prettier --print-width=100 --tab-width=4 --end-of-line=auto --single-quote --write \"./src/**/*.js\"",
+    "minify": "npm run minify-bundle && npm run minify-css",
+    "minify-bundle": "minify ./index.js > ./index.min.js",
+    "minify-css": "minify ./index.css > ./index.min.css",
+    "local": "http-server .",
+    "test-page": "start chrome ./test-page/index.html && start firefox ./test-page/index.html && start iexplore file://%CD%/test-page/index.html",
+    "watch": "rollup -c -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/samussiah/animated-change-from-baseline.git"
+  },
+  "keywords": [
+    "animated",
+    "change",
+    "from",
+    "baseline",
+    "bubble",
+    "plot",
+    "animation"
+  ],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/samussiah/animated-change-from-baseline/issues"
+  },
+  "homepage": "https://github.com/samussiah/animated-change-from-baseline#readme",
+  "dependencies": {
+    "d3": "^6.2.0",
+    "d3-force-reuse": "^1.0.1",
+    "d3-force-sampled": "^1.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.3",
+    "@babel/preset-env": "^7.12.1",
+    "@rollup/plugin-commonjs": "^16.0.0",
+    "@rollup/plugin-node-resolve": "^10.0.0",
+    "minify": "^6.0.0",
+    "prettier": "^2.1.2",
+    "rollup": "^2.32.1",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-web-worker-loader": "^1.4.0"
+  }
+}
