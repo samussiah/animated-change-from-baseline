@@ -1,8 +1,9 @@
 export default function x() {
+    const maxChange = d3.max(this.subset, d => Math.abs(d.change));
     const scale = d3
-        .scaleBand()
-        .domain(d3.range(-3, 4))
-        .range([this.settings.margin.left, this.settings.width - this.settings.margin.left - this.settings.margin.right]);
+        .scaleLinear()
+        .domain([-maxChange, maxChange])
+        .range([0, this.settings.width]);
 
     return scale;
 }

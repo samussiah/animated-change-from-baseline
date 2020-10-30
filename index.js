@@ -6,7 +6,7 @@
 
     function addElement(name, parent) {
       var tagName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'div';
-      var element = parent.append(tagName).classed("acfb-".concat(name), true);
+      var element = parent.append(tagName).classed("acfb-".concat(name, " afcb-").concat(tagName), true);
       return element;
     }
 
@@ -16,15 +16,6 @@
 
     function settings() {
       return {
-        // dimensions
-        width: null,
-        height: null,
-        margin: {
-          top: 30,
-          right: 10,
-          bottom: 10,
-          left: 90
-        },
         // variable mappings
         id_var: 'USUBJID',
         stratum_var: 'ARM',
@@ -32,20 +23,48 @@
         visit_order_var: 'AVISITN',
         measure_var: 'PARAM',
         result_var: 'AVAL',
-        change_var: 'CHG'
+        change_var: 'CHG',
+        percent_change_var: 'PCHG',
+        // timepoint
+        timepoint: 0,
+        speed: 5000,
+        // mark attributes
+        shape: 'circle',
+        radius: 10,
+        // dimensions
+        width: null,
+        // defined in ./layout
+        height: null,
+        // defined in ./layout
+        margin: {
+          top: 30,
+          right: 10,
+          bottom: 10,
+          left: 90
+        }
       };
     }
 
     function layout() {
       var main = this.util.addElement('main', d3.select(this.element));
-      this.settings.width = this.settings.width || main.node().clientWidth;
-      this.settings.height = this.settings.height || main.node().clientHeight;
-      var svg = this.util.addElement('svg', main, 'svg').attr('width', this.settings.width).attr('height', this.settings.height);
-      var g = this.util.addElement('g', main, 'g');
+      this.settings.width = (this.settings.width || main.node().clientWidth) - this.settings.margin.left - this.settings.margin.right;
+      this.settings.height = (this.settings.height || main.node().clientHeight) - this.settings.margin.top - this.settings.margin.bottom;
+      var svg = this.util.addElement('svg', main, 'svg').attr('width', this.settings.width + this.settings.margin.left + this.settings.margin.right).attr('height', this.settings.height + this.settings.margin.top + this.settings.margin.bottom);
+      var canvas = this.util.addElement('canvas', svg, 'g').attr('transform', "translate(".concat(this.settings.margin.left, ",").concat(this.settings.margin.top, ")"));
+      var xAxis = this.util.addElement('x-axis', canvas, 'g'); //.attr('transform', `translate(0,${this.settings.margin.top})`);
+
+      var yAxis = this.util.addElement('y-axis', canvas, 'g'); //.attr('transform', `translate(${this.settings.margin.left},0)`);
+
+      var timepoint = this.util.addElement('timepoint', canvas, 'text') //.attr('x', this.settings.margin.left)
+      .attr('dx', 4) //.attr('y', this.settings.margin.top)
+      .attr('dy', 4).attr('alignment-baseline', 'hanging');
       return {
         main: main,
         svg: svg,
-        g: g
+        xAxis: xAxis,
+        yAxis: yAxis,
+        canvas: canvas,
+        timepoint: timepoint
       };
     }
 
@@ -185,7 +204,25 @@
       });
     }
 
-    function addVariables() {}
+    function addVariables() {
+      d3.rollup(this.data, function (group) {
+        group.sort(function (a, b) {
+          a.visit_order - b.visit_order;
+        }); // TODO: don't assume first visit is baseline
+
+        group.baseline = group[0];
+        group.forEach(function (d) {
+          d.baseline = group.baseline.result;
+          d.chg = d.result - d.baseline;
+          d.fchg = d.chg / d.baseline;
+          d.pchg = d.fchg * 100;
+        });
+      }, function (d) {
+        return d.measure;
+      }, function (d) {
+        return d.id;
+      });
+    }
 
     function sort() {//this.data.sort((a,b) => {
       //});
@@ -243,6 +280,14 @@
       var group;
 
       switch (variable) {
+        case 'measure,id':
+          group = d3.groups(this.data, function (d) {
+            return d.measure;
+          }, function (d) {
+            return d.id;
+          });
+          break;
+
         default:
           group = d3.group(this.data, function (d) {
             return d[variable];
@@ -259,50 +304,152 @@
       group.stratum = createGroup.call(this, 'stratum');
       group.visit = createGroup.call(this, 'visit');
       group.measure = createGroup.call(this, 'measure');
+      group.measure_id = createGroup.call(this, 'measure,id');
       return group;
-    }
-
-    function change() {
-      var scale = d3.scaleQuantize().domain([-100, 100]).range(d3.range(-3, 4));
-      return scale;
-    }
-
-    function color() {
-      var scale = d3.scaleBand().domain(this.group.stratum).range([this.settings.margin.top, this.settings.height - this.settings.margin.top - this.settings.margin.bottom]);
-      return scale;
-    }
-
-    function x() {
-      var scale = d3.scaleBand().domain(d3.range(-3, 4)).range([this.settings.margin.left, this.settings.width - this.settings.margin.left - this.settings.margin.right]);
-      return scale;
-    }
-
-    function y() {
-      var scale = d3.scaleBand().domain(this.group.stratum).range([this.settings.margin.top, this.settings.height - this.settings.margin.top - this.settings.margin.bottom]);
-      return scale;
-    }
-
-    function scale() {
-      var scale = {};
-      scale.change = change.call(this);
-      scale.color = color.call(this);
-      scale.x = x.call(this);
-      scale.y = y.call(this);
-      return scale;
     }
 
     function data() {
       mutateData.call(this);
       this.set = set.call(this);
       this.group = group.call(this);
-      this.scale = scale.call(this);
-      console.log(this.data);
-      console.log(this.set);
-      console.log(this.group);
-      console.log(this.scale);
     }
 
-    function init() {}
+    function x() {
+      var maxChange = d3.max(this.subset, function (d) {
+        return Math.abs(d.change);
+      });
+      var scale = d3.scaleLinear().domain([-maxChange, maxChange]).range([0, this.settings.width]);
+      return scale;
+    }
+
+    function y() {
+      var scale = d3.scaleBand().domain(this.set.stratum).range([this.settings.height, 0]);
+      return scale;
+    }
+
+    function color() {
+      var scale = d3.scaleOrdinal().domain(this.set.stratum).range(d3.schemeCategory10);
+      return scale;
+    }
+
+    function scale() {
+      var scale = {};
+      scale.x = x.call(this);
+      scale.y = y.call(this);
+      scale.color = color.call(this); //scale.change = change.call(this);
+
+      return scale;
+    }
+
+    function xAxis() {
+      var axis = d3.axisTop(this.scale.x)(this.layout.xAxis);
+      return axis;
+    }
+
+    function yAxis() {
+      var axis = d3.axisLeft(this.scale.y)(this.layout.yAxis);
+      return axis;
+    }
+
+    function timepoint() {
+      var timepoint = this.set.visit[this.settings.timepoint];
+      this.layout.timepoint.text(timepoint);
+      return timepoint;
+    }
+
+    function data$1() {
+      var _this = this;
+
+      this.measure_id.forEach(function (group) {
+        group.stratum = group[1][0].stratum; // TODO: get most recent prior result if no result found at current timepoint
+
+        group.datum = group[1].find(function (d) {
+          return d.visit === _this.timepoint;
+        });
+        group.chg = group.datum ? group.datum.chg : null;
+      });
+    }
+
+    function nodes() {
+      var _this = this;
+
+      data$1.call(this);
+      var nodes = this.layout.canvas.selectAll('circle').data(this.measure_id, function (d) {
+        return d[1];
+      }).join('circle').attr('r', this.settings.radius).attr('fill', function (d) {
+        return _this.scale.color(d.stratum);
+      }).attr('fill-opacity', .5).attr('stroke', function (d) {
+        return _this.scale.color(d.stratum);
+      }).attr('stroke-opacity', 1);
+      return nodes;
+    }
+
+    function tick() {
+      this.nodes //.filter(d => d.pchg_bin !== null)
+      .attr('cx', function (d) {
+        return d.x;
+      }).attr('cy', function (d) {
+        return d.y;
+      });
+    }
+
+    function simulation() {
+      var _this = this;
+
+      var simulation = d3.forceSimulation().nodes(this.measure_id) //.force('center', d3.forceCenter()
+      //    .x(d => this.scale.x(d.chg))
+      //    .y(d => this.scale.y(d.stratum) + this.scale.y.bandwidth() / 2)
+      //)
+      .force('x', d3.forceX(function (d) {
+        return _this.scale.x(d.chg);
+      })).force('y', d3.forceY(function (d) {
+        return _this.scale.y(d.stratum) + _this.scale.y.bandwidth() / 2;
+      })).force('collide', d3.forceCollide().radius(this.settings.radius + 1)) //.force('charge', d3.forceManyBody())
+      .on('tick', tick.bind(this));
+      return simulation;
+    }
+
+    function simulation$1() {
+      var _this = this;
+
+      this.simulation.alpha(1).force('x', d3.forceX(function (d) {
+        return _this.scale.x(d.chg);
+      })).force('y', d3.forceY(function (d) {
+        return _this.scale.y(d.stratum) + _this.scale.y.bandwidth() / 2;
+      })).restart();
+    }
+
+    function interval() {
+      var _this = this;
+
+      var interval = d3.interval(function () {
+        _this.settings.timepoint++;
+        if (_this.settings.timepoint >= _this.set.visit.length) _this.settings.timepoint = 0;
+        _this.timepoint = timepoint.call(_this);
+        data$1.call(_this);
+        simulation$1.call(_this);
+      }, this.settings.speed);
+      return interval;
+    }
+
+    function init() {
+      var _this = this;
+
+      this.measure = this.set.measure[Math.floor(Math.random() * this.set.measure.length)];
+      this.measure_id = this.group.measure_id.find(function (d) {
+        return d[0] === _this.measure;
+      })[1];
+      this.subset = this.data.filter(function (d) {
+        return d.measure === _this.measure;
+      });
+      this.scale = scale.call(this);
+      this.xAxis = xAxis.call(this);
+      this.yAxis = yAxis.call(this);
+      this.timepoint = timepoint.call(this);
+      this.nodes = nodes.call(this);
+      this.simulation = simulation.call(this);
+      this.interval = interval.call(this);
+    }
 
     function forceDirectedGraph(_data_) {
       var _element_ = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'body';

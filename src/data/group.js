@@ -7,6 +7,7 @@ export default function group() {
     group.stratum = createGroup.call(this, 'stratum');
     group.visit = createGroup.call(this, 'visit');
     group.measure = createGroup.call(this, 'measure');
+    group.measure_id = createGroup.call(this, 'measure,id');
 
     return group;
 }

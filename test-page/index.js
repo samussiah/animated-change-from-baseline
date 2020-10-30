@@ -9,6 +9,7 @@ fetch('./data/adlb.csv')
             data,//subset,
             '#container',
             {
+                stratum_var: 'RACE',
             }
         );
     });

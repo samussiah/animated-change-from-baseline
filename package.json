@@ -1,5 +1,5 @@
 {
-    "TODO": "add canvas",
+  "TODO": "smooth the animation and give some indication of how long each visit displays",
   "name": "animated-change-from-baseline",
   "version": "1.0.0",
   "description": "an animated bubble plot of change from baseline",
