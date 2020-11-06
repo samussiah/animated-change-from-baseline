@@ -1,7 +1,7 @@
 export default function layout() {
     const main = this.util.addElement('main', d3.select(this.element));
     this.settings.width = (this.settings.width || main.node().clientWidth) - this.settings.margin.left - this.settings.margin.right;
-    this.settings.height = (this.settings.height || main.node().clientHeight) - this.settings.margin.top - this.settings.margin.bottom;
+    this.settings.height = (this.settings.height || main.node().clientHeight*2/3) - this.settings.margin.top - this.settings.margin.bottom;
     const svg = this.util.addElement('svg', main, 'svg')
         .attr('width', this.settings.width + this.settings.margin.left + this.settings.margin.right)
         .attr('height', this.settings.height + this.settings.margin.top + this.settings.margin.bottom);
@@ -13,10 +13,7 @@ export default function layout() {
         //.attr('transform', `translate(${this.settings.margin.left},0)`);
     const timepoint = this.util.addElement('timepoint', canvas, 'text')
         //.attr('x', this.settings.margin.left)
-        .attr('dx', 4)
-        //.attr('y', this.settings.margin.top)
-        .attr('dy', 4)
-        .attr('alignment-baseline', 'hanging');
+        .attr('y', -this.settings.margin.top/2)
 
     return {
         main,

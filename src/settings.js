@@ -21,6 +21,6 @@ export default function settings() {
         // dimensions
         width: null, // defined in ./layout
         height: null, // defined in ./layout
-        margin: { top: 30, right: 10, bottom: 10, left: 90 },
+        margin: { top: 69, right: 10, bottom: 10, left: 90 },
     };
 }

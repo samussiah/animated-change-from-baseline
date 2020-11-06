@@ -37,7 +37,7 @@
         height: null,
         // defined in ./layout
         margin: {
-          top: 30,
+          top: 69,
           right: 10,
           bottom: 10,
           left: 90
@@ -48,7 +48,7 @@
     function layout() {
       var main = this.util.addElement('main', d3.select(this.element));
       this.settings.width = (this.settings.width || main.node().clientWidth) - this.settings.margin.left - this.settings.margin.right;
-      this.settings.height = (this.settings.height || main.node().clientHeight) - this.settings.margin.top - this.settings.margin.bottom;
+      this.settings.height = (this.settings.height || main.node().clientHeight * 2 / 3) - this.settings.margin.top - this.settings.margin.bottom;
       var svg = this.util.addElement('svg', main, 'svg').attr('width', this.settings.width + this.settings.margin.left + this.settings.margin.right).attr('height', this.settings.height + this.settings.margin.top + this.settings.margin.bottom);
       var canvas = this.util.addElement('canvas', svg, 'g').attr('transform', "translate(".concat(this.settings.margin.left, ",").concat(this.settings.margin.top, ")"));
       var xAxis = this.util.addElement('x-axis', canvas, 'g'); //.attr('transform', `translate(0,${this.settings.margin.top})`);
@@ -56,8 +56,7 @@
       var yAxis = this.util.addElement('y-axis', canvas, 'g'); //.attr('transform', `translate(${this.settings.margin.left},0)`);
 
       var timepoint = this.util.addElement('timepoint', canvas, 'text') //.attr('x', this.settings.margin.left)
-      .attr('dx', 4) //.attr('y', this.settings.margin.top)
-      .attr('dy', 4).attr('alignment-baseline', 'hanging');
+      .attr('y', -this.settings.margin.top / 2);
       return {
         main: main,
         svg: svg,
@@ -318,7 +317,7 @@
       var maxChange = d3.max(this.subset, function (d) {
         return Math.abs(d.change);
       });
-      var scale = d3.scaleLinear().domain([-maxChange, maxChange]).range([0, this.settings.width]);
+      var scale = d3.scaleLinear().nice().domain([-maxChange, maxChange]).range([0, this.settings.width]);
       return scale;
     }
 
@@ -342,12 +341,32 @@
     }
 
     function xAxis() {
-      var axis = d3.axisTop(this.scale.x)(this.layout.xAxis);
+      var axis = this.layout.xAxis.call(d3.axisTop(this.scale.x).tickSize(-this.settings.height)) //.call(g => g.select('.domain').remove())
+      .call(function (g) {
+        return g.selectAll('.tick line').attr('stroke-opacity', 0.5).attr('stroke-dasharray', '2,2');
+      }); // TODO: move styles to index.css
+
+      this.layout.xAxis.append('text').classed('achb-axis-label achb-axis-label--x', true).attr('text-anchor', 'middle').attr('x', this.settings.width / 2).attr('y', -this.settings.margin.top / 2).style('font-size', '1.5rem').style('fill', 'black').text(this.measure);
       return axis;
     }
 
     function yAxis() {
-      var axis = d3.axisLeft(this.scale.y)(this.layout.yAxis);
+      var _this = this;
+
+      var axis = this.layout.yAxis.call(d3.axisLeft(this.scale.y)).call(function (g) {
+        var text = g.selectAll('.tick text');
+        text.text(null); // Stratum label.
+
+        text.append('tspan').attr('x', -9).attr('text-anchor', 'end').text(function (d) {
+          return d;
+        }); // Stratum size.
+
+        text.append('tspan').attr('x', -9).attr('text-anchor', 'end').attr('dy', 15).text(function (d) {
+          return "n=".concat(new Set(_this.group.stratum.get(d).map(function (d) {
+            return d.id;
+          })).size);
+        });
+      });
       return axis;
     }
 
