@@ -13,6 +13,7 @@ export default function settings() {
         // timepoint
         timepoint: 0,
         speed: 5000,
+        play: true,
 
         // mark attributes
         shape: 'circle',

@@ -9,3 +9,23 @@
 .acfb-invisible {
     visibility: hidden !important;
 }
+
+/* controls */
+
+.acfb-controls {
+    width: 100%;
+}
+.acfb-controls div {
+    display: inline-block;
+    margin-right: 8px;
+}
+.acfb-button {
+    min-width: 64px;
+    padding: 4px 0;
+}
+
+/* canvas */
+
+.acfb-canvas {
+    width: 100%;
+}
