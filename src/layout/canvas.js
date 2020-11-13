@@ -17,8 +17,8 @@ export default function canvas(main) {
     //.attr('transform', `translate(0,${this.settings.margin.top})`);
     const yAxis = this.util.addElement('y-axis', canvas, 'g');
     //.attr('transform', `translate(${this.settings.margin.left},0)`);
-    const bubbles = this.util.addElement('bubbles', canvas, 'g');
     const violins = this.util.addElement('violins', canvas, 'g');
+    const bubbles = this.util.addElement('bubbles', canvas, 'g');
 
     return {
         svg,
@@ -26,7 +26,7 @@ export default function canvas(main) {
         timepoint,
         xAxis,
         yAxis,
-        bubbles,
         violins,
+        bubbles,
     };
 }
