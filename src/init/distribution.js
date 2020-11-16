@@ -12,7 +12,7 @@ export default function distribution() {
             return bins;
         },
         (d) => d.stratum
-    );
+    ).sort((a,b) => a[0] < b[0] ? -1 : 1);
 
     rollups.forEach(d => {
         d[1].stratum = d[0];
@@ -28,12 +28,13 @@ export default function distribution() {
         .domain([-nBins, nBins]);
 
     const violins = this.util
-        .addElement('violin', this.layout.violins, 'g', rollups)
-        .attr('transform', (d) => `translate(0,${this.scale.y(d[0])})`)
+        .addElement('violin', this.layout.violins, 'g', rollups, d => d[0])
+        .attr('transform', (d) => `translate(0,${this.scale.y(d[0])})`);
+    violins
         .append('path')
         .datum((d) => d[1])
         .style('fill', d => this.scale.color(d.stratum))
-        .style('fill-opacity', .5)
+        .style('fill-opacity', .25)
         .style('stroke', 'none')
         .attr(
             'd',

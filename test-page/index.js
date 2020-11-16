@@ -7,8 +7,8 @@ fetch('./data/adlb.csv')
             '#container',
             {
                 //stratum_var: 'RACE',
-                speed: 1000,
-                play: false,
+                //speed: 1000,
+                //play: false,
             }
         );
     });

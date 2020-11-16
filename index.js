@@ -7,7 +7,10 @@
     function addElement(name, parent) {
       var tagName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'div';
       var data = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
-      return data ? parent.selectAll("".concat(tagName, ".acfb-").concat(name, ".acfb-").concat(tagName)).data(data).join(tagName).classed("acfb-".concat(name, " acfb-").concat(tagName), true) // multiple elements
+      var id = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : function (d, i) {
+        return i;
+      };
+      return data ? parent.selectAll("".concat(tagName, ".acfb-").concat(name, ".acfb-").concat(tagName)).data(data, id).join(tagName).classed("acfb-".concat(name, " acfb-").concat(tagName), true) // multiple elements
       : parent.append(tagName).classed("acfb-".concat(name, " acfb-").concat(tagName), true); // single element
     }
 
@@ -32,7 +35,7 @@
         play: true,
         // mark attributes
         shape: 'circle',
-        radius: 10,
+        radius: 5,
         // dimensions
         width: null,
         // defined in ./layout
@@ -233,6 +236,8 @@
         return bins;
       }, function (d) {
         return d.stratum;
+      }).sort(function (a, b) {
+        return a[0] < b[0] ? -1 : 1;
       });
       this.distribution.rollups.forEach(function (d) {
         d[1].stratum = d[0];
@@ -243,14 +248,12 @@
         });
       });
       this.distribution.binScale.domain([-this.distribution.nBins, this.distribution.nBins]);
-      this.layout.violins.select('g').remove();
-      this.distribution.violins = this.util.addElement('violin', this.layout.violins, 'g', this.distribution.rollups).attr('transform', function (d) {
-        return "translate(0,".concat(_this.scale.y(d[0]), ")");
-      }).append('path').datum(function (d) {
+      this.distribution.violins.data(this.distribution.rollups, function (d) {
+        return d[0];
+      });
+      this.distribution.violins.select('path').datum(function (d) {
         return d[1];
-      }).style('fill', function (d) {
-        return _this.scale.color(d.stratum);
-      }).style('fill-opacity', .5).style('stroke', 'none').attr('d', d3.area().x(function (d) {
+      }).transition().duration(this.settings.speed / 4).attr('d', d3.area().x(function (d) {
         return _this.scale.x(d.x0);
       }).y0(function (d) {
         return _this.distribution.binScale(-d.length);
@@ -583,8 +586,7 @@
     }
 
     function tick() {
-      this.nodes //.filter(d => d.pchg_bin !== null)
-      .attr('cx', function (d) {
+      this.nodes.attr('cx', function (d) {
         return d.x;
       }).attr('cy', function (d) {
         return d.y;
@@ -619,6 +621,8 @@
         return bins;
       }, function (d) {
         return d.stratum;
+      }).sort(function (a, b) {
+        return a[0] < b[0] ? -1 : 1;
       });
       rollups.forEach(function (d) {
         d[1].stratum = d[0];
@@ -629,13 +633,16 @@
         });
       });
       var binScale = d3.scaleLinear().range([0, this.scale.y.bandwidth()]).domain([-nBins, nBins]);
-      var violins = this.util.addElement('violin', this.layout.violins, 'g', rollups).attr('transform', function (d) {
+      var violins = this.util.addElement('violin', this.layout.violins, 'g', rollups, function (d) {
+        return d[0];
+      }).attr('transform', function (d) {
         return "translate(0,".concat(_this.scale.y(d[0]), ")");
-      }).append('path').datum(function (d) {
+      });
+      violins.append('path').datum(function (d) {
         return d[1];
       }).style('fill', function (d) {
         return _this.scale.color(d.stratum);
-      }).style('fill-opacity', .5).style('stroke', 'none').attr('d', d3.area().x(function (d) {
+      }).style('fill-opacity', .25).style('stroke', 'none').attr('d', d3.area().x(function (d) {
         return _this.scale.x(d.x0);
       }).y0(function (d) {
         return binScale(-d.length);

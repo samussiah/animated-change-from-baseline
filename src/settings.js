@@ -17,7 +17,7 @@ export default function settings() {
 
         // mark attributes
         shape: 'circle',
-        radius: 10,
+        radius: 5,
 
         // dimensions
         width: null, // defined in ./layout
