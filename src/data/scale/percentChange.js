@@ -1,5 +1,5 @@
-export default function change() {
-    const maxChange = d3.max(this.subset, (d) => Math.abs(d.change));
+export default function percentChange() {
+    const maxChange = d3.max(this.subset, (d) => Math.abs(d.percent_change));
     const scale = d3
         .scaleLinear()
         .nice()

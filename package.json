@@ -1,7 +1,7 @@
 {
-  "TODO": "smooth the animation and give some indication of how long each visit displays",
+  "TODO": "transition the violin plots between visits and figure out why the violins' fill is shuffling",
   "name": "animated-change-from-baseline",
-  "version": "1.0.0",
+  "version": "0.2.0",
   "description": "an animated bubble plot of change from baseline",
   "module": "./src/index.js",
   "main": "./index.js",

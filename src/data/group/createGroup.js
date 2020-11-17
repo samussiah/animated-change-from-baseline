@@ -2,18 +2,15 @@ export default function createGroup(variable) {
     let group;
 
     switch (variable) {
-        case ('measure,id'):
+        case 'measure,id':
             group = d3.groups(
                 this.data,
-                d => d.measure,
-                d => d.id
+                (d) => d.measure,
+                (d) => d.id
             );
             break;
         default:
-            group = d3.group(
-                this.data,
-                d => d[variable]
-            );
+            group = d3.group(this.data, (d) => d[variable]);
             break;
     }
 
