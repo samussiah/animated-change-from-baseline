@@ -14,6 +14,7 @@
 
 .acfb-controls {
     width: 100%;
+    margin-bottom: 1rem;
 }
 .acfb-controls div {
     display: inline-block;
@@ -21,11 +22,41 @@
 }
 .acfb-button {
     min-width: 64px;
-    padding: 4px 0;
+    padding: 4px 8px;
+    cursor: pointer;
+}
+.acfb-button.acfb-active {
+    font-weight: bold;
+    color: green;
 }
 
 /* canvas */
 
 .acfb-canvas {
     width: 100%;
+}
+.acfb-timepoint {
+    border-radius: 5px;
+    font-size: 1.75rem;
+    text-shadow: black 0px 0px 10px;
+    font-weight: 600;
+}
+.tick {
+    font-size: 0.8rem;
+}
+.acfb-stratum-count {
+    font-weight: bold;
+}
+.acfb-node {
+    fill-opacity: 0.5;
+    stroke-opacity: 1;
+    stroke-width: 1;
+}
+.acfb-node.acfb-clicked {
+    fill-opacity: 0.75;
+    stroke-width: 2;
+}
+.acfb-node:hover {
+    fill-opacity: 0.75;
+    stroke-width: 2;
 }

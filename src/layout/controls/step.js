@@ -5,7 +5,7 @@ export default function step(controls) {
     const div = this.util.addElement('step', controls);
     const buttons = this.util.addElement('button', div, 'button', ['<', '>']).text((d) => d);
 
-    buttons.on('click', function () {
+    buttons.on('click', function (event, d) {
         main.settings.play = false;
         main.controls.play.button.text('play');
         if (main.interval) main.interval.stop();

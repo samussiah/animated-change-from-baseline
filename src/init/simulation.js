@@ -10,7 +10,7 @@ export default function simulation() {
         //)
         .force(
             'x',
-            d3.forceX((d) => this.scale.x(d.chg))
+            d3.forceX((d) => this.scale.x(d[this.settings.outcome]))
         )
         .force(
             'y',

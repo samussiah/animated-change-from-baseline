@@ -7,7 +7,7 @@ export default function play(controls) {
         .addElement('button', div, 'button')
         .text(this.settings.play ? 'pause' : 'play');
 
-    button.on('click', function () {
+    button.on('click', function (event, d) {
         main.settings.play = !main.settings.play;
         d3.select(this).text(main.settings.play ? 'pause' : 'play');
         if (main.settings.play) main.interval = interval.call(main);

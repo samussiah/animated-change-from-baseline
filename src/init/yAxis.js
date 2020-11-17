@@ -5,12 +5,14 @@ export default function yAxis() {
 
         // Stratum label.
         text.append('tspan')
+            .classed('acfb-stratum-label', true)
             .attr('x', -9)
             .attr('text-anchor', 'end')
             .text((d) => d);
 
         // Stratum size.
         text.append('tspan')
+            .classed('acfb-stratum-count', true)
             .attr('x', -9)
             .attr('text-anchor', 'end')
             .attr('dy', 15)

@@ -1,4 +1,4 @@
-export default function addElement(name, parent, tagName = 'div', data = null, id = (d,i) => i) {
+export default function addElement(name, parent, tagName = 'div', data = null, id = (d, i) => i) {
     return data
         ? parent
               .selectAll(`${tagName}.acfb-${name}.acfb-${tagName}`)

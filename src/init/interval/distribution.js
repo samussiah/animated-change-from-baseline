@@ -1,16 +1,23 @@
 export default function distribution() {
-    this.distribution.rollups = d3.rollups(
-        this.measure_id,
-        (group) => {
-            const input = group.map((d) => d.chg);
-            const bins = this.distribution.binGenerator(input);
+    this.distribution.binGenerator = d3
+        .bin()
+        .domain(this.scale.x.domain())
+        .thresholds(this.scale.x.ticks(20));
 
-            return bins;
-        },
-        (d) => d.stratum
-    ).sort((a,b) => a[0] < b[0] ? -1 : 1);
+    this.distribution.rollups = d3
+        .rollups(
+            this.measure_id,
+            (group) => {
+                const input = group.map((d) => d[this.settings.outcome]);
+                const bins = this.distribution.binGenerator(input);
 
-    this.distribution.rollups.forEach(d => {
+                return bins;
+            },
+            (d) => d.stratum
+        )
+        .sort((a, b) => (a[0] < b[0] ? -1 : 1));
+
+    this.distribution.rollups.forEach((d) => {
         d[1].stratum = d[0];
     });
 
@@ -18,14 +25,14 @@ export default function distribution() {
         d3.max(d[1], (di) => di.length)
     );
 
-    this.distribution.binScale
-        .domain([-this.distribution.nBins, this.distribution.nBins]);
+    this.distribution.binScale.domain([-this.distribution.nBins, this.distribution.nBins]);
 
-    this.distribution.violins.data(this.distribution.rollups, d => d[0]);
-    this.distribution.violins.select('path')
+    this.distribution.violins.data(this.distribution.rollups, (d) => d[0]);
+    this.distribution.violins
+        .select('path')
         .datum((d) => d[1])
         .transition()
-        .duration(this.settings.speed/4)
+        .duration(this.settings.speed / 4)
         .attr(
             'd',
             d3
