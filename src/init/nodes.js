@@ -11,8 +11,8 @@ export default function nodes() {
     const nodes = this.util
         .addElement('node', this.layout.bubbles, 'circle', this.measure_id, (d) => d[1])
         .attr('r', this.settings.radius)
-        .attr('fill', (d) => this.scale.color(d.stratum))
-        .attr('stroke', (d) => this.scale.color(d.stratum));
+        .attr('fill', (d) => this.scale.color(d.result))
+        .attr('stroke', (d) => this.scale.color(d.result));
 
     // Add tooltip.
     nodes.append('title').text((d) => d.tooltip);

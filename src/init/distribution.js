@@ -28,7 +28,7 @@ export default function distribution() {
     violins
         .append('path')
         .datum((d) => d[1])
-        .style('fill', (d) => this.scale.color(d.stratum))
+        .style('fill', (d) => '#aaa')
         .style('fill-opacity', 0.25)
         .style('stroke', 'none')
         .attr(
