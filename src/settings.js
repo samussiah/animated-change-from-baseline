@@ -1,6 +1,6 @@
 export default function settings() {
     return {
-        // variable mappings
+        // variable mapping
         id_var: 'USUBJID',
         stratum_var: 'ARM',
         strata: null,
@@ -26,10 +26,14 @@ export default function settings() {
             fchg: 'Fold Change',
         },
 
-        // timepoint
+        // statistics
+        aggregate: 'mean',
+
+        // animation
+        play: true,
         timepoint: 0,
         speed: 5000,
-        play: true,
+        loop_delay: 5000,
 
         // mark attributes
         shape: 'circle',
